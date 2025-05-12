@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Seworqs\Commons\I18n;
+namespace Seworqs\Commons\I18n\Registry;
 
 use Laminas\Translator\TranslatorInterface;
 

@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Seworqs\Commons\I18n\Factory;
 
-use Psr\Container\ContainerInterface;
 use Laminas\I18n\Translator\Translator as LaminasTranslator;
+use Psr\Container\ContainerInterface;
 use Seworqs\Commons\I18n\CompositeTranslator;
+use Seworqs\Commons\I18n\Registry\TranslatorRegistry;
 use Seworqs\Commons\I18n\Translator;
-use Seworqs\Commons\I18n\TranslatorRegistry;
 
 /**
  * Factory for composing translators and applying fallback decorator.
@@ -26,10 +26,19 @@ final class TranslatorFactory
 
     public static function createStandAlone(array $translatorConfig = []): Translator
     {
-        $locale       = $translatorConfig['locale'] ?? null;
-        $fallback     = $translatorConfig['fallbackLocale'] ?? 'en';
-        $patterns     = $translatorConfig['translation_file_patterns'] ?? [];
+        $locale   = $translatorConfig['locale'] ?? null;
+        $fallback = $translatorConfig['fallbackLocale'] ?? 'en';
+        $patterns = $translatorConfig['translation_file_patterns'] ?? [];
 
+        // Always include internal enum translations first!
+        array_unshift($patterns, [
+            'type'        => 'phpArray',
+            'base_dir'    => realpath(__DIR__ . '/../../resources/languages/enum'),
+            'pattern'     => '%s.php',
+            'text_domain' => 'enum',
+        ]);
+
+        // Optional: add other file types (gettext, etc.)
         $arrayPatterns   = array_filter($patterns, fn($p) => ($p['type'] ?? '') === 'phpArray');
         $gettextPatterns = array_filter($patterns, fn($p) => ($p['type'] ?? '') === 'gettext');
 

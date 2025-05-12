@@ -1,53 +1,97 @@
 # Examples
 
 ## Install via Composer
+
 ```bash
 composer require seworqs/commons-i18n
 ```
 
-## Basic Usage (stand alone)
+## Basic Setup (Standalone)
 
-### Create and register the Translator.
 ```php
 use Seworqs\Commons\I18n\Factory\TranslatorFactory;
-use Seworqs\Commons\I18n\TranslatorRegistry;
+use Seworqs\Commons\I18n\Registry\TranslatorRegistry;
 
-// You can also use .mo files for type=gettext.
-$config = [
-    'locale'                   => 'nl_NL',
-    'fallbackLocale'           => 'en',
-    'translation_file_patterns'=> [
-        [
-            'type'     => 'phpArray',
-            'base_dir' => __DIR__ . '/language/messages',
-            'pattern'  => '%s.php',
-        ],
-    ],
-];
+$translator = TranslatorFactory::createStandAlone([
+    'locale' => 'nl_NL',
+    'fallbackLocale' => 'en'
+]);
 
-$translator = TranslatorFactory::createStandAlone($config);
 TranslatorRegistry::register('default', $translator);
 ```
 
-### Translate via helper functions.
+## Translation Helpers
+
 ```php
-// Single translation.
+use function Seworqs\Commons\I18n\t;
+use function Seworqs\Commons\I18n\t2;
+use function Seworqs\Commons\I18n\tc;
+
+// Single translation
 echo t('greeting.hello');
 
-// Plural translation with count injection.
-echo t2('item.one', 'item.many', 3); 
+// Plural translation with count injection
+echo t2('item.one', 'item.many', 3);
 
-// Context based translation.
-echo tc('errors', ' not_found');
+// Context-based translation
+echo tc('errors', 'not_found');
 
-// Some more options (params).
-echo t('Hi %s, you have %d items', ['SEworqs',5]);
+// With parameters
+echo t('Hi %s, you have %d items', ['SEworqs', 5]);
 
-// Some more options (params, text domain).
-echo t('Hi %s, you have %d items', ['SEworqs',5], 'SomeTextDomain');
+// With text domain
+echo t('Hi %s, you have %d items', ['SEworqs', 5], 'custom');
 
-// Some more options (params, text domain, locale).
-echo t('Hi %s, you have %d items', ['SEworqs',5], 'SomeTextDomain', 'en_US');
-
+// With locale override
+echo t('Hi %s, you have %d items', ['SEworqs', 5], 'custom', 'en_US');
 ```
 
+## Using Built-in Translatable Enums
+
+```php
+use Seworqs\Commons\I18n\Enum\Common\EnumGender;
+
+$gender = EnumGender::MALE;
+echo $gender->getTranslatedString();
+```
+
+```php
+use Seworqs\Commons\I18n\Enum\FormatType\EnumBooleanFormatType;
+
+$options = EnumBooleanFormatType::toOptionsArray();
+// ['yes_no' => 'Yes / No', ...]
+```
+
+## Create Your Own Translatable Enums
+
+```php
+use Seworqs\Commons\I18n\Contract\TranslatableEnumInterface;
+use Seworqs\Commons\I18n\Traits\TranslatableEnumTrait;
+
+enum MyStatus: string implements TranslatableEnumInterface
+{
+    use TranslatableEnumTrait;
+
+    case PENDING = 'pending';
+    case DONE    = 'done';
+
+    public static function getTranslationPrefix(): string
+    {
+        return 'enum.status';
+    }
+
+    public static function getTextDomain(): string
+    {
+        return 'enum';
+    }
+}
+```
+
+And provide language files like:
+
+```php
+return [
+    'enum.status.pending' => 'Pending',
+    'enum.status.done' => 'Done',
+];
+```

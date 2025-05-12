@@ -1,10 +1,13 @@
 <?php
+
 declare(strict_types=1);
 
-use Seworqs\Commons\I18n\TranslatorRegistry;
+namespace Seworqs\Commons\I18n\Functions;
+
+use Seworqs\Commons\I18n\Registry\TranslatorRegistry;
 
 /**
- * Formats a translated string safely with parameters.
+ * Safe formatting helper.
  */
 function safeSprintf(string $message, array $params = []): string
 {
@@ -28,14 +31,12 @@ function t(
     string      $textDomain = 'default',
     ?string     $locale     = null
 ): string {
-    $translator = TranslatorRegistry::getTranslator();
-    $translated = (string)$translator->translate($message, $textDomain, $locale);
-
+    $translated = TranslatorRegistry::getTranslator()->translate($message, $textDomain, $locale);
     return safeSprintf($translated, $params);
 }
 
 /**
- * Plural translation, always injects the count as first %d.
+ * Plural translation.
  */
 function t2(
     string      $singular,
@@ -45,8 +46,7 @@ function t2(
     string      $textDomain = 'default',
     ?string     $locale     = null
 ): string {
-    $translator = TranslatorRegistry::getTranslator();
-    $translated = (string)$translator->translatePlural(
+    $translated = TranslatorRegistry::getTranslator()->translatePlural(
         $singular,
         $plural,
         $number,
@@ -60,7 +60,6 @@ function t2(
 
 /**
  * Context-based translation.
- * Assumes your phpArray fixtures use keys like 'context|message'.
  */
 function tc(
     string      $context,
@@ -68,9 +67,8 @@ function tc(
     array       $params     = [],
     ?string     $locale     = null
 ): string {
-    $translator = TranslatorRegistry::getTranslator();
     $key        = $context . '|' . $message;
-    $translated = (string)$translator->translate($key, 'context', $locale);
+    $translated = TranslatorRegistry::getTranslator()->translate($key, 'context', $locale);
 
     return safeSprintf($translated, $params);
 }
