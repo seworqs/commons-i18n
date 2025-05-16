@@ -31,12 +31,20 @@ final class TranslatorFactory
         $patterns = $translatorConfig['translation_file_patterns'] ?? [];
 
         // Always include internal enum translations first!
-        array_unshift($patterns, [
-            'type'        => 'phpArray',
-            'base_dir'    => realpath(__DIR__ . '/../../resources/languages/enum'),
-            'pattern'     => '%s.php',
-            'text_domain' => 'enum',
-        ]);
+        array_unshift($patterns,
+            [
+                'type'        => 'phpArray',
+                'base_dir'    => realpath(__DIR__ . '/../../resources/languages/enum'),
+                'pattern'     => '%s.php',
+                'text_domain' => 'enum',
+            ],
+            [
+                'type'        => 'phpArray',
+                'base_dir'    => realpath(__DIR__ . '/../../resources/languages/http'),
+                'pattern'     => '%s.php',
+                'text_domain' => 'http',
+            ]
+        );
 
         // Optional: add other file types (gettext, etc.)
         $arrayPatterns   = array_filter($patterns, fn($p) => ($p['type'] ?? '') === 'phpArray');

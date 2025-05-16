@@ -53,4 +53,9 @@ final class TranslatorFunctionsTest extends BaseTranslationTestCase
         // Too few params for placeholders.
         $this->assertSame('Hallo %s %s. [!! FORMAT ERROR]', t('broken.placeholders', ['wereld'], 'test'));
     }
+    public function testTextDomainHttp(): void
+    {
+       $this->assertSame('Niet gevonden', t('status.404', [], 'http', 'nl_NL'));
+       $this->assertSame('I\'m a teapot', t('status.418', [], 'http', 'en_US'));
+    }
 }

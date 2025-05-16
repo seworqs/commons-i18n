@@ -44,6 +44,9 @@ echo t('Hi %s, you have %d items', ['SEworqs', 5], 'custom');
 
 // With locale override
 echo t('Hi %s, you have %d items', ['SEworqs', 5], 'custom', 'en_US');
+
+// HTTP Status codes.
+echo t('status.404', [], 'http', 'nl_NL');
 ```
 
 ## Using Built-in Translatable Enums
